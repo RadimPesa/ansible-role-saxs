@@ -16,11 +16,13 @@
   copy:
     src: create.sh
     dest: /tmp/create.sh
+    mode: "u=rwx,g=r,o=r"
 
 - name: Copy run script
   copy:
     src: run.sh
     dest: /tmp/run.sh
+    mode: "u=rwx,g=r,o=r"
 
 - group:
     name: saxs
