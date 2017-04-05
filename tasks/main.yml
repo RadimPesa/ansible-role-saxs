@@ -1,0 +1,48 @@
+---
+- name: Installing dependencies
+  yum: name=python-virtualenv,wget,python34
+
+- name: Copy sax-portal
+  copy:
+    src: saxs-portal.tar.gz
+    dest: /tmp/saxs-portal.tar.gz
+
+- name: Copy sax-server
+  copy:
+    src: saxs-server.tar.gz
+    dest: /tmp/saxs-server.tar.gz
+
+- name: Copy create script
+  copy:
+    src: create.sh
+    dest: /tmp/create.sh
+
+- name: Copy run script
+  copy:
+    src: run.sh
+    dest: /tmp/run.sh
+
+- name: Create saxs user and add it to required groups
+  user:
+    name: saxs
+    shell: /bin/bash
+    groups: saxs,apache
+    generate_ssh_key: yes
+    append: yes
+
+- name: Update apache user groups
+  user:
+    name: apache
+    shell: /bin/bash
+    groups: saxs,apache
+    append: yes
+
+- name: Run 'create.sh' script as the saxs user
+  command: /tmp/create.sh
+  become: true
+  become_user: saxs
+
+- name: Run 'run.sh' script as the saxs user
+  command: /tmp/run.sh
+  become: true
+  become_user: saxs

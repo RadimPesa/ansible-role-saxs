@@ -1,0 +1,44 @@
+---
+- name: Installing dependencies
+  yum: name=python-virtualenv,wget,python34
+
+- name: Set pattern to remove
+  find:
+    paths: "/etc/httpd/conf.d"
+    patterns: "*.conf"
+  register: result
+
+- name: Remove apache configuration files
+  file:
+    path: "{{item.path}}"
+    state: absent
+  with_items: result.files
+
+- name: Configuring Apache
+  copy:
+    src: saxs.conf
+    dest: /etc/httpd/conf.d/saxs.conf
+
+- name: Create saxs user and add it to required groups
+  user:
+    name: saxs
+    shell: /bin/bash
+    groups: saxs,apache
+    append: yes
+
+- name: Update apache user groups
+  user:
+    name: apache
+    shell: /bin/bash
+    groups: saxs,apache
+    append: yes
+
+- name: Configuring Apache
+  copy:
+    src: saxs-portal.tar.gz
+    dest: /tmp/saxs-portal.tar.gz
+
+- name: Extract saxs portal
+  unarchive:
+    src: saxs-portal.tar.gz
+    dest: /var/www
