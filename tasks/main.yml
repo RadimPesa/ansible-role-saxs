@@ -22,6 +22,10 @@
     src: run.sh
     dest: /tmp/run.sh
 
+- group:
+    name: saxs
+    state: present
+
 - name: Create saxs user and add it to required groups
   user:
     name: saxs
