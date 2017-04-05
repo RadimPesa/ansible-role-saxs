@@ -43,10 +43,6 @@
 
 - name: Run 'create.sh' script as the saxs user
   command: /tmp/create.sh
-  become: true
-  become_user: saxs
 
 - name: Run 'run.sh' script as the saxs user
   command: /tmp/run.sh
-  become: true
-  become_user: saxs
