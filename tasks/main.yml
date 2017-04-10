@@ -24,7 +24,8 @@
     dest: /tmp/run.sh
     mode: "u=rwx,g=r,o=r"
 
-- group:
+- name: Create saxs system group
+  group:
     name: saxs
     state: present
 
@@ -43,8 +44,8 @@
     groups: saxs,apache
     append: yes
 
-- name: Run 'create.sh' script as the saxs user
+- name: Run 'create.sh' script
   command: /tmp/create.sh
 
-- name: Run 'run.sh' script as the saxs user
+- name: Run 'run.sh' script
   command: /tmp/run.sh
