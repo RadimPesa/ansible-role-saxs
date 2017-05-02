@@ -1,51 +1,83 @@
 ---
-- name: Installing dependencies
-  yum: name=python-virtualenv,wget,python34
+- name: Update operating system
+  yum: name=* state=latest update_cache=yes
 
-- name: Copy sax-portal
-  copy:
-    src: saxs-portal.tar.gz
-    dest: /tmp/saxs-portal.tar.gz
+- name: install scipion prerequisities
+  yum: name={{ item }} state=present
+  with_items:
+   - screen
+   - mc
+   - gcc-c++
+   - glibc-headers
+   - gcc
+   - cmake
+   - java-1.8.0-openjdk-devel.x86_64
+   - libXft-devel.x86_64
+   - openssl-devel.x86_64
+   - libXext-devel.x86_64
+#   - libxml++.x86_64
+   - libquadmath-devel.x86_64
+   - libxslt.x86_64
+   - openmpi-devel.x86_64
+   - gsl-devel.x86_64
+   - libX11.x86_64
+   - gcc-gfortran.x86_64
 
-- name: Copy sax-server
-  copy:
-    src: saxs-server.tar.gz
-    dest: /tmp/saxs-server.tar.gz
+# donwload a unpack package
+- unarchive:
+    src: "{{ binary_url }}"
+    dest: /opt
+    remote_src: True
 
-- name: Copy create script
-  copy:
-    src: create.sh
-    dest: /tmp/create.sh
-    mode: "u=rwx,g=r,o=r"
+- name: Change owner
+  file:
+    path: "{{ scipion_home_dir }}"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    recurse: yes
 
-- name: Copy run script
-  copy:
-    src: run.sh
-    dest: /tmp/run.sh
-    mode: "u=rwx,g=r,o=r"
+- name: Run config
+  command: "/usr/bin/python {{ scipion_home_dir }}/scipion config --overwrite"
+  become: yes
+  become_user: "{{ user_name }}"
+  when: os == 'centos'
 
-- name: Create saxs system group
-  group:
-    name: saxs
-    state: present
+- name: Change scipion.config 1
+  lineinfile:
+    dest: "{{ scipion_config_file }}"
+    regexp: '^MPI_LIBDIR'
+    line: 'MPI_LIBDIR = /usr/lib64/openmpi/lib'
+  when: os == 'centos'
 
-- name: Create saxs user and add it to required groups
-  user:
-    name: saxs
-    shell: /bin/bash
-    groups: saxs,apache
-    generate_ssh_key: yes
-    append: yes
+- name: Change scipion.config 2
+  lineinfile:
+    dest: "{{ scipion_config_file }}"
+    regexp: '^MPI_INCLUDE'
+    line: 'MPI_INCLUDE = /usr/include/openmpi-x86_64'
+  when: os == 'centos'
 
-- name: Update apache user groups
-  user:
-    name: apache
-    shell: /bin/bash
-    groups: saxs,apache
-    append: yes
+- name: Change scipion.config 3
+  lineinfile:
+    dest: "{{ scipion_config_file }}"
+    regexp: '^MPI_BINDIR'
+    line: 'MPI_BINDIR = /usr/lib64/openmpi/bin'
+  when: os == 'centos'
 
-- name: Run 'create.sh' script
-  command: /tmp/create.sh
+- name: Run config
+  command: "/usr/bin/python {{ scipion_home_dir }}/scipion config"
+  become: yes
+  become_user: "{{ user_name }}"
 
-- name: Run 'run.sh' script
-  command: /tmp/run.sh
+
+- name: Create directory /services
+  file:
+    path: /services
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+
+- name: Extract sh_alignment
+  unarchive:
+    src: "{{ alig_url }}"
+    dest: "{{ scipion_home_dir }}/software/lib/python2.7/site-packages/"
+    remote_src: True

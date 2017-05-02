@@ -1,5 +1,5 @@
-# ansible-role-saxs
-Saxs role made for West Life demo
+# ansible-role-scipion
+Scipion role demo
 
 ## TOSCA template:
 ```

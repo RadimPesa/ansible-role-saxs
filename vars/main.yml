@@ -1,0 +1,10 @@
+---
+
+scipion_config_file: "/opt/scipion-web/config/scipion.conf"
+scipion_home_dir: "/opt/scipion-web"
+user_name: "centos"
+home_dir: "/home/centos"
+mpi_hosts_file: "/home/centos/mpi_hosts"
+mpi_bin_dir: "/usr/lib64/openmpi/bin"
+binary_url: "http://dior.ics.muni.cz/~cuda/scipion_web_bin.tgz"
+alig_url: "http://dior.ics.muni.cz/~cuda/aliment.tar.gz"
